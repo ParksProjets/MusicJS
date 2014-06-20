@@ -45,6 +45,11 @@ window.addEventListener("drop", function (e) {
 		readFile(e.dataTransfer.files[i]);
 
 	$dropHelp.fadeOut();
+	Menu.open();
+	setTimeout(function() {
+		$(window).mousemove(onMouseMove);
+	}, 2000);
+
 	dragging = 0;
 }, false);
 
@@ -103,3 +108,8 @@ function readFile(file) {
 	fr.readAsArrayBuffer(file);
 
 }
+
+
+
+// On affiche le message au lancement
+$dropHelp.fadeIn();

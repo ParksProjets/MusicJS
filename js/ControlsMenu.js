@@ -86,15 +86,21 @@ function dancerUpdate() {
 
 var menuOpened = false;
 
-function ouvreMenu() {
-	menuOpened = true;
-	$("#menu").css("right", 0);
+var Menu = {
+
+	opened: false,
+
+	open: function() {
+		$("#menu").css("right", 0);
+		Menu.opened = true;
+	},
+
+	close: function() {
+		$("#menu").css("right", "-260px");
+		Menu.opened = false;
+	}
 }
 
-function fermeMenu() {
-	menuOpened = false;
-	$("#menu").css("right", "-260px");
-}
 
 
 
@@ -120,18 +126,13 @@ $("#btnEQ").click(function() {
 
 // Events window
 
-$(window).mousemove(onMouseMove);
-
-
 function onMouseMove(e) {
-	if(menuOpened) {
-		if(e.pageX < wWidth - 255)
-			fermeMenu();
-	}
-	else {
-		if(e.pageX > wWidth - 80)
-			ouvreMenu();
-	}
+	
+	if (Menu.opened && e.pageX < wWidth - 255)
+		Menu.close();
+
+	else if (!Menu.opened && e.pageX > wWidth - 80)
+		Menu.open();
 }
 
 
