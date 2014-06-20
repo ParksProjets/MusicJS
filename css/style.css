@@ -1,0 +1,120 @@
+@font-face {
+	font-family: 'icomoon';
+	src:url('fonts/icomoon.eot');
+	src:url('fonts/icomoon.eot?#iefix') format('embedded-opentype'),
+		url('fonts/icomoon.woff') format('woff'),
+		url('fonts/icomoon.ttf') format('truetype'),
+		url('fonts/icomoon.svg#icomoon') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+
+*, body, div, p, canvas {
+	margin: 0;
+	padding: 0;
+	color: #222;
+	font: 18px Arial, sans-serif;
+}
+
+body {
+	overflow: hidden;
+	background-color: rgb(201, 201, 201);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+#ffts .fft {
+	display: none;
+	position: relative;
+}
+
+.optionFft {
+	display: none;
+	width: 200px;
+	height: 200px;
+	background: rgb(91, 170, 91);;
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	z-index: 999;
+	border-radius: 5px;
+}
+
+.optionFft h3 {
+	text-align: center;
+	padding: 5px 0;
+	color: #16460F;
+	height: 20px;
+	font-size: 20px;
+	line-height: 20px;
+	background: rgb(43, 129, 61);
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	font-weight: bold;
+	cursor: move;
+}
+
+
+
+
+/* FFTs Options */
+
+#fft1 .slider1 {
+	margin: 10px;
+}
+
+
+
+
+
+
+#dropMusic {
+	display: none;
+	background: rgba(0, 0, 0, 0.81);
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+#dropMusic p {
+	color: #fff;
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	text-align: center;
+	height: 30px;
+	line-height: 30px;
+	font-size: 30px;
+	margin-top: -15px;
+}
+
+
+
+
+
+
+#eq {
+	display: none;
+	width: 250px;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	background: #4A3F5A;
+	overflow: hidden;
+	box-shadow: #353535 0px 0px 8px 2px;
+	z-index: 999999;
+}

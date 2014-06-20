@@ -1,0 +1,216 @@
+/*
+
+Feuille de style du menu
+
+*/
+
+
+
+/* Menu */
+
+#menu {
+	width: 250px;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	right: -260px;
+	background: rgb(74, 63, 90);
+	overflow: hidden;
+	transition: right 1s;
+	box-shadow: rgb(53, 53, 53) 0px 0px 8px 2px;
+	z-index: 999999;
+}
+
+#menu .contents {
+	width: 250px;
+	position: absolute;
+	top: 0;
+	transition: top .8s;
+}
+
+
+
+
+
+
+/* Switch play/pause */
+
+#switch {
+	width: 120px;
+	height: 120px;
+	margin: 20px 58px;
+	border: 7px solid #C5C5C5;
+	border-radius: 67px;
+	background: transparent;
+	transition: background .3s;
+	cursor: pointer;
+}
+
+#switch:hover {
+	background: rgb(130, 108, 150);
+}
+
+#switch div {
+	font: 50px icomoon;
+	text-align: center;
+	width: 100%;
+	margin-top: 35px;
+}
+
+#pause {
+	display: none;
+}
+
+#play {
+	margin-left: 5px;
+}
+
+
+
+
+
+
+/* Barre progression */
+
+#progress {
+	position: relative;
+	background: rgb(31, 31, 31);
+	border-radius: 3px;
+	height: 6px;
+	width: 200px;
+	margin: 0 25px;
+	cursor: pointer;
+}
+
+#progress div {
+	position: absolute;
+	height: 7px;
+	width: 7px;
+	top: -4.5px;
+	background: #868686;
+	margin-left: -4.5px;
+	left: 0;
+	border: 4px solid #5A5A5A;
+	border-radius: 7.5px;
+}
+
+
+#temps {
+	width: 200px;
+	margin: 1px 25px 0;
+	height: 17px;
+}
+
+#temps span {
+	font-size: 17px;
+	color: rgb(11, 30, 71);
+}
+
+#temps span:last-of-type {
+	float: right;
+}
+
+
+
+
+
+
+/* Autres bouttons */
+
+#buttons {
+	height: 40px;
+	margin: 15px 40px 0;
+	width: 170px;
+}
+
+#buttons div {
+	width: 30px;
+	height: 20px;
+	float: left;
+	font: 20px icomoon;
+	text-align: center;
+	cursor: pointer;
+	margin: 0 13.3px;
+	transition: color .4s;
+}
+
+#buttons div:hover {
+	color: rgb(97, 20, 57);
+}
+
+
+
+
+
+
+/* Songs */
+
+#songs {
+	border-top: 1px solid #140F27;
+}
+
+#songs > div {
+	padding: 3px 5px;
+	height: 26px;
+	background: rgba(0, 0, 0, 0.21);
+	border-bottom: 1px solid #140F27;
+	transition: background .4s;
+	cursor: pointer;
+}
+
+#songs > div:hover {
+	background: rgba(233, 233, 233, 0.15);
+}
+
+
+#songs > div p {
+	color: #E6E6E6;
+	font-size: 16px;
+	line-height: 25px;
+	float: left;
+}
+
+#songs > div p.del {
+	float: left;
+	/* font-family: 'icomoon'; */
+	font-size: 10px;
+	margin-right: 6px;
+}
+
+#songs > div p.name {
+	max-width: 176px;
+	overflow: hidden;
+	height: 100%;
+}
+
+#songs > div p.duration, #songs > div .loader1 {
+	float: right;
+}
+
+
+
+
+
+
+/* Options */
+
+#params {
+	position: absolute;
+	width: 190px;
+	left: 0;
+	padding-bottom: 13px;
+	margin: 0 30px;
+}
+
+#params h3 {
+	text-align: center;
+	height: 22px;
+	margin-bottom: 3px;
+}
+
+#params a {
+	display: block;
+	color: #FFF;
+	cursor: pointer;
+	line-height: 30px;
+}

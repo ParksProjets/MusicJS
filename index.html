@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<meta charset="UTF-8">
+	<title>Musique</title>
+	<meta name="description" content="Musique">
+
+	<link href="css/knob.css" rel="stylesheet">
+	<link href="css/loader1.css" rel="stylesheet">
+	<link href="css/ControlsMenu.css" rel="stylesheet">
+	<link href="css/style.css" rel="stylesheet">
+
+</head>
+<body>
+	
+	<div id="menu">
+		<div class="contents">
+	
+			<div id="switch">
+				<div id="play">&#xe000;</div>
+				<div id="pause">&#xe001;</div> 
+			</div>
+			
+			<div id="progress">
+				<div></div>
+			</div>
+
+			<div id="temps">
+				<span></span>
+				<span></span>
+			</div>
+			
+			<div id="buttons">
+				<div id="last">&#xe002;</div>
+				<div id="stop">&#xe004;</div>
+				<div id="next">&#xe003;</div> 
+			</div>
+			
+			
+			
+			<div id="songs"></div>
+			
+			
+			<div id="params">
+				<h3>OPTIONS</h3>
+				<p>
+					<a id="btnEQ">Equalizer</a>
+					<a>Options FFT</a>
+				</p>
+			</div>
+	
+		</div>
+	</div>
+
+
+
+
+	<div id="eq">
+		<br><br>
+		<div id="volume"></div>
+
+		<br>
+		<div id="highGain"></div>
+
+		<br>
+		<div id="midGain"></div>
+
+		<br>
+		<div id="lowGain"></div>
+	</div>
+	
+	
+
+	
+	<div id="ffts">
+	
+		<div class="fft" id="fft0" style="display: block">
+			<canvas width="200" height="200"></canvas>
+		</div>
+
+		
+		<div class="fft" id="fft1">
+			<canvas width="200" height="200" style="position: absolute; z-index: 2"></canvas>
+		</div>
+		
+	</div>
+	
+	
+	
+	<div id="dropMusic">
+		<p>Déposez votre musique ici</p>
+	</div>
+	
+	
+	
+
+
+	<script src="js/vendors/jquery.js"></script>
+	<script src="js/vendors/TweenMax.js"></script>
+	<script src="js/vendors/dancer.js"></script>
+	<script src="js/vendors/three.min.js"></script>
+	<script src="js/vendors/three-post.min.js"></script>
+
+	<script src="js/knob.js"></script>
+	
+	<script src="js/main.js"></script>
+	<script src="js/FFTManager.js"></script>
+	<script src="js/EQMenu.js"></script>
+	<script src="js/ControlsMenu.js"></script>
+	<script src="js/DropMusic.js"></script>
+
+	<!-- FFTs -->
+	<script src="js/FFT/fft0.js"></script>
+	<script src="js/FFT/fft1.js"></script>
+
+</body>
+</html>
