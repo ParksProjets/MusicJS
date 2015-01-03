@@ -1,36 +1,41 @@
 /*
 
-Fichier de gestion du menu et des controls
+Menus
+
+© Guillaume Gonnet
+License GPLv2
 
 */
 
 
-// Utlis
 
-function parseTime(time) {
-	var minutes = Math.floor(time / 60);
-	var secondes = Math.floor(time - minutes*60)
-	return ((minutes < 10) ? "0"+minutes : minutes) + ":" + ((secondes < 10) ? "0"+secondes : secondes);
-}
+// Functions: control player
 
-
+dancer.bind("end", function() {
+	FFTManager.resetAll();
+	dancerUpdate();
+});
 
 
 
-// Controls
+
+
+
+// Controls HTML
 
 var $progress = $("#progress div"), 
 	$temps1 = $("#temps span:eq(0)"), 
 	$temps2 = $("#temps span:eq(1)");
 
-var timer;
+var timer = null;
 
 
 $("#switch").click(function() {
+
 	if (dancer.isPlaying())
-		dancer.pause();
+		Player.pause();
 	else
-		dancer.play();
+		Player.play();
 });
 
 
@@ -40,13 +45,17 @@ $("#progress").click(function(e) {
 });
 
 
-$("#stop").click(function() {
-	dancer.pause();
-	FFTManager.resetAll();
+$("#stop").click(Player.stop);
 
-	dancer.setTime(0);
-	dancerUpdate();
-});
+
+
+
+$("#next").click(Player.next);
+
+$("#last").click(Player.last);
+
+
+
 
 
 
@@ -57,7 +66,6 @@ dancer.bind("play", function() {
 
 	timer = setInterval(dancerUpdate, 1000 / 30);
 	$temps2.text(parseTime(dancer.getDuration()));
-
 });
 
 
@@ -66,9 +74,9 @@ dancer.bind("pause", function() {
 
 	$("#pause").hide();
 	$("#play").show();
-	if(timer)
-		clearInterval(timer);
-
+	
+	clearInterval(timer);
+	dancerUpdate();
 });
 
 
@@ -105,26 +113,22 @@ var Menu = {
 
 
 
-
 // Options
 
 $("#params").hover(function() {
+	
 	$("#menu .contents").css("top", (- $(this).height() + 19) + "px");
 }, function() {
+	
 	$("#menu .contents").css("top", 0); 
 });
 
 
-$("#btnEQ").click(function() {
-	EQMenu.switch();
-});
 
 
 
 
-
-
-// Events window
+// Events Window
 
 function onMouseMove(e) {
 	

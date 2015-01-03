@@ -9,21 +9,58 @@ FFT Visualisation barres
 
 
 	var canvas = $("#fft0 canvas")[0],
-		ctx = canvas.getContext('2d'),
-
-		h = 0,
-		w = 0,
-
-		min = 0,
-		max = 400;
-
+		ctx = canvas.getContext('2d');
 
 	ctx.fillStyle = "#666666";
+
+	var h = 0, w = 0;
+	var min = 0, max = 400;
+
+
+	var $title = $("#fft0Title"),
+		$bpm = $("#fft0BPM"),
+		titleVisible = true;
+
+	function showTitle(value) {
+		titleVisible = value;
+
+		if (value)
+			$title.add($bpm).fadeIn();
+		else
+			$title.add($bpm).fadeOut();
+	}
+
+
+	function setTitle() {
+		var song = Player.playlist.get();
+
+		$title.text(song.name);
+
+		if (song.bpm)
+			$bpm.text(song.bpm.tempo + ' BPM');
+		else
+			$bpm.empty();
+	}
 
 
 
 
 	var fft = {
+
+		onPlay: function() {
+			setTitle();
+
+			if (titleVisible)
+				$title.add($bpm).fadeIn();
+		},
+
+		on: function() {
+			setTitle();
+
+			if (dancer.isPlaying() && titleVisible)
+				$title.add($bpm).show();
+		},
+
 
 		onKick: function() {
 			ctx.fillStyle = "#ff0077";
@@ -59,18 +96,24 @@ FFT Visualisation barres
 		reset: function() {
 			ctx.fillStyle = "#666666";
 			ctx.clearRect( 0, 0, w, h );
-		},
 
-
-		on: function() {
-
-		},
-
-
-		off: function() {
-			
+			if (!dancer.isPlaying())
+				$title.add($bpm).fadeOut();
 		}
 	};
+
+
+
+
+	fft.options = [
+		{
+			type: "checkbox",
+			text: t('show title'),
+			onChange: showTitle,
+			checked: true
+		}
+	];
+
 
 
 

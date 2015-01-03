@@ -1,0 +1,73 @@
+/*
+
+Knob
+
+*/
+
+
+
+.knob {
+
+	.wheelContainer {
+		
+		margin: 0 auto;
+		position: relative;
+	
+		.tige {
+			position: absolute;
+			height: 8px;
+			width: 3px;
+			background: #3A3A3A;
+			z-index: 3;
+		}
+
+
+		.lt {
+			transform: rotate(-45deg);
+			right: 6px;
+		}
+
+
+		.rt {
+			transform: rotate(45deg);
+			left: 6px;
+		}
+
+	}
+
+
+
+	.wheel {
+
+		background: #A3A3A3;
+		position: relative;
+		cursor: pointer;
+
+		div {
+			position: absolute;
+			top: 0;
+			left: 50%;
+			background: #616161;
+			width: 3px;
+			margin-left: -1.5px;
+		}
+
+
+		p {
+			position: absolute;
+			top: 50%;
+			text-align: center;
+			left: 0;
+			right: 0;
+			color: #585858;
+
+			-moz-user-select: none;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+			-o-user-select: none;
+			user-select: none;
+		}
+
+	}
+
+}

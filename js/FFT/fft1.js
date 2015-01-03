@@ -114,7 +114,7 @@ FTT Logo 3D
 
 		// Loader
 		var loader = new THREE.JSONLoader();
-		loader.load( "model4.js", createGeometry);
+		loader.load( "asset/model4.js", createGeometry);
 
 	}
 

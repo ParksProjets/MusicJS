@@ -3,13 +3,10 @@
 <head>
 
 	<meta charset="UTF-8">
-	<title>Musique</title>
+	<title>Music</title>
 	<meta name="description" content="Musique">
 
-	<link href="css/knob.css" rel="stylesheet">
-	<link href="css/loader1.css" rel="stylesheet">
-	<link href="css/ControlsMenu.css" rel="stylesheet">
-	<link href="css/style.css" rel="stylesheet">
+	<link href="css/allv2.css" rel="stylesheet">
 
 </head>
 <body>
@@ -42,11 +39,14 @@
 			<div id="songs"></div>
 			
 			
+			<p class="tr" id="helpBtn">help</p>
+
 			<div id="params">
 				<h3>OPTIONS</h3>
 				<p>
+					<a id="btnMusic">Options Music</a>
 					<a id="btnEQ">Equalizer</a>
-					<a>Options FFT</a>
+					<a id="btnFFT">Options FFT</a>
 				</p>
 			</div>
 	
@@ -56,32 +56,139 @@
 
 
 
+	<div class="menu" id="optionsFFT">
+		
+		<h3 class="tr">general options</h3>
+
+		<h5>Beat</h5>
+		<input type="radio" name="beat" value="kick" id="radioKick" checked>
+		<label for="radioKick"><span></span>Kicks</label><br>
+
+		<input type="radio" name="beat" value="beatdetector" id="radioBeat">
+		<label for="radioBeat"><span></span>Tempo</label><br>
+
+		<input type="radio" name="beat" value="none" id="radioNone">
+		<label for="radioNone"><span></span>None</label><br>
+
+
+		<h3>FFT Options</h3>
+
+		<div id="fftOptions"></div>
+
+	</div>
+
+
+
+	<div class="menu" id="musicMenu">
+		
+		<h3>Music Menu</h3>
+
+		<h5>Tempo</h5>
+		<select id="musicTempo">
+			<option value="2">Very fast: x2</option>
+			<option value="1.5">Fast: x1.5</option>
+			<option value="1.25">Normal+: x1.25</option>
+			<option value="1" selected>Normal: x1</option>
+			<option value="0.8">Normal-: x0.8</option>
+			<option value="0.67">Slow: x0.67</option>
+			<option value="0.5">Very slow: x0.5</option>
+		</select><br><br>
+
+
+		<h5>Cross Fade</h5>
+		<input type="radio" name="crossfade" value="true" id="radioCFOn" checked>
+		<label for="radioCFOn"><span></span>Enabled</label><br>
+
+		<input type="radio" name="crossfade" value="false" id="radioCFOff">
+		<label for="radioCFOff"><span></span class="tr">Disenabled</label><br>
+
+	</div>
+
+
+
 	<div id="eq">
-		<br><br>
 		<div id="volume"></div>
 
-		<br>
 		<div id="highGain"></div>
 
-		<br>
 		<div id="midGain"></div>
 
-		<br>
 		<div id="lowGain"></div>
+	</div>
+
+
+
+
+	<div class="menu" id="help">
+		
+		<h3 class="tr">shortcuts</h3>
+
+		<p><span class="tr">space</span> Play/Stop</p>
+
+		<p><span>↓</span> Next vizualizer</p>
+
+		<p><span>↑</span> Prev vizualizer</p>
+
+		<p><span>M</span> Music Menu</p>
+
+		<p><span>E</span> Equalizer</p>
+
+		<p><span>O</span> FFT Options</p>
+		<br>
+
+
+		<h3 class="tr">author</h3>
+
+		<p>
+			<b>Guillaume Gonnet</b><br>
+			License: GPLv2<br>
+			<br>
+			<a href="https://github.com/ParksProjets/MusicJS">GitHub</a>
+		</p>
+
 	</div>
 	
 	
 
 	
 	<div id="ffts">
-	
+		
+		<!-- FFT 0 -->
 		<div class="fft" id="fft0" style="display: block">
 			<canvas width="200" height="200"></canvas>
+			<p id="fft0Title"></p>
+			<p id="fft0BPM"></p>
 		</div>
 
 		
+		<!-- FFT 1 -->
 		<div class="fft" id="fft1">
 			<canvas width="200" height="200" style="position: absolute; z-index: 2"></canvas>
+		</div>
+
+
+		<!-- FFT 2 -->
+		<div class="fft" id="fft2">
+			<img>
+
+			<div id="fft2Music">
+				<div id="fft2Progress">
+					<div id="fft2Point">
+						<canvas width="40" height="40"></canvas>
+						<div></div>
+					</div>
+				</div>
+
+				<div id="fft2Times">
+					<p id="fft2TimeElapsed"></p>
+					<p id="fft2TimeLeft"></p>
+				</div>
+			</div>
+		</div>
+
+
+		<!-- FFT 3 -->
+		<div class="fft" id="fft3">
 		</div>
 		
 	</div>
@@ -89,30 +196,19 @@
 	
 	
 	<div id="dropMusic">
-		<p>Déposez votre musique ici</p>
+		<p class="tr">drop music here</p>
 	</div>
 	
 	
 	
 
 
-	<script src="js/vendors/jquery.js"></script>
+	<script src="js/vendors/jquery.min.js"></script>
 	<script src="js/vendors/TweenMax.js"></script>
 	<script src="js/vendors/dancer.js"></script>
 	<script src="js/vendors/three.min.js"></script>
-	<script src="js/vendors/three-post.min.js"></script>
 
-	<script src="js/knob.js"></script>
-	
-	<script src="js/main.js"></script>
-	<script src="js/FFTManager.js"></script>
-	<script src="js/EQMenu.js"></script>
-	<script src="js/ControlsMenu.js"></script>
-	<script src="js/DropMusic.js"></script>
-
-	<!-- FFTs -->
-	<script src="js/FFT/fft0.js"></script>
-	<script src="js/FFT/fft1.js"></script>
+	<script src="js/allv2.js"></script>
 
 </body>
 </html>

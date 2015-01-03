@@ -1,0 +1,84 @@
+/*
+
+Menus
+
+*/
+
+
+.menu {
+
+	display: none;
+	width: 250px;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	background: #4A3F5A;
+	overflow: hidden;
+	box-shadow: #353535 0px 0px 8px 2px;
+	z-index: 999999;
+
+
+	h3 {
+		color: #FFF;
+		padding: 10px 0;
+		text-align: center;
+		margin-top: 20px;
+	}
+
+
+	h5 {
+		font-size: 20px;
+		padding: 5px 10px;
+	}
+
+	
+
+	$DarkBrown: #302926;
+	$Border: #27211F;
+	$Orange: #CC3300;
+
+	input[type="radio"] {
+		margin-left: 20px;
+		display:none;
+	}
+
+	input[type="radio"] + label {
+		color: $DarkBrown;
+		font-size: 17px;
+		margin: 0 20px;
+		line-height: 32px;
+	}
+
+	input[type="radio"] + label span {
+		display: inline-block;
+		width: 13px;
+		height: 13px;
+		margin: -4px 4px 0 0;
+		vertical-align: middle;
+		cursor: pointer;
+		border: 6px solid $Border;
+		border-radius:  50%;
+	}
+
+	input[type="radio"] + label span {
+		background-color: $DarkBrown;
+	}
+
+	input[type="radio"]:checked + label span{
+		background-color: $Orange;
+	}
+
+	input[type="radio"] + label span, input[type="radio"]:checked + label span {
+		-webkit-transition: background-color 0.4s linear;
+		transition: background-color 0.4s linear;
+	}
+
+
+
+	input[type="checkbox"] {
+		margin-right: 5px;
+		margin-left: 15px;
+	}
+
+}

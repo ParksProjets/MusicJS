@@ -1,13 +1,16 @@
 /*
 
-Fichier principal
+Main File
+
+© Guillaume Gonnet
+License GPLv2
 
 */
 
 
 
 
-
+// Window size
 
 var wHeight = 0, wWidth = 0;
 
@@ -15,15 +18,24 @@ function resize(e) {
 
 	wHeight = $(window).height();
 	wWidth = $(window).width();
-
-	//$("body").height(wHeight).width(wWidth);
-	$("#params").css("top", (wHeight - 25) + "px");
-
 }
 
 
 $(window).resize(resize);
 resize();
+
+
+
+
+// Menus
+
+var Menus = [];
+
+Menus.hideAll = function() {
+
+	for (var i = 0; i  < Menus.length; i++)
+		Menus[i].hide();
+}
 
 
 
@@ -35,10 +47,6 @@ var dancer = new Dancer(),
 	adapter = new Dancer.adapters.webaudiobuffer(dancer);
 		
 dancer.audioAdapter = adapter;
-
-
-var kick;
-
 
 
 
@@ -57,11 +65,19 @@ function onKeyDown(e) {
 		FFTManager.next();
 	}
 
-	else if (e.keyCode == 32) { // Espace
+	else if (e.keyCode == 32) { // Space
 		$("#switch").trigger("click");
 	}
 
 	else if (e.keyCode == 69) { // E
 		EQMenu.switch();
+	}
+
+	else if (e.keyCode == 79) { // O
+		FFTMenu.switch();
+	}
+
+	else if (e.keyCode == 77) { // O
+		MusicMenu.switch();
 	}
 }

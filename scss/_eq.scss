@@ -1,0 +1,65 @@
+/*
+
+Menu EQ
+
+*/
+
+
+
+#eq {
+
+	display: none;
+	width: 250px;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	background: #4A3F5A;
+	overflow: hidden;
+	box-shadow: #353535 0px 0px 8px 2px;
+	z-index: 999999;
+
+
+	.knob {
+
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 20%;
+		margin-top: -50px;
+
+		&:nth-child(2) {
+			top: 40%;
+		}
+
+		&:nth-child(3) {
+			top: 60%;
+		}
+
+		&:nth-child(4) {
+			top: 80%;
+		}
+
+	}
+	
+}
+
+
+
+@media screen and (max-height: 550px) {
+	
+	#eq .knob {
+		margin-top: 15px !important;
+	}
+
+}
+
+
+@media screen and (max-height: 600px) {
+	
+	#eq .knob {
+		position: static;
+		margin-top: 33px;
+	}
+
+}

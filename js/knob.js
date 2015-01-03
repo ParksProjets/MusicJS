@@ -1,6 +1,9 @@
 /*
 
+Knob: control volume for example
 
+© Guillaume Gonnet
+License GPLv2
 
 */
 
@@ -157,29 +160,3 @@ function Knob($elem, options) {
 	$wheel.bind("mousedown", mousedown);
 
 }
-
-
-
-
-
-Knob.prototype = {};
-
-
-Knob.prototype.changeOptions = function(option, val) {
-
-	this.options[option] = val;
-
-	switch (option) {
-
-		case "name":
-			this.$wheel.find("p").text(val);
-			break;
-
-	}
-	
-	
-}
-
-
-
-

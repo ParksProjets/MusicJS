@@ -1,7 +1,7 @@
 /*
- * dancer - v0.4.0 - 2014-06-20
+ * dancer - v0.5.3 - 2015-01-03
  * https://github.com/jsantell/dancer.js
- * Copyright (c) 2014 Jordan Santell
+ * Copyright (c) 2015 Jordan Santell & Guillaume Gonnet
  * Licensed MIT
  */
 (function() {
@@ -13,7 +13,9 @@
 		this.bind( 'update', update );
 	};
 
-	Dancer.version = '0.3.2';
+
+	Dancer.version = '0.5.0';
+	
 	Dancer.adapters = {};
 
 	Dancer.prototype = {
@@ -38,6 +40,8 @@
 			return this;
 		},
 
+
+
 		/* Controls */
 
 		play : function () {
@@ -59,6 +63,7 @@
 			this.audioAdapter.setTime( val );
 			return this;
 		},
+
 
 
 		/* Actions */
@@ -91,6 +96,7 @@
 			}
 			return this;
 		},
+
 
 
 		/* Getters */
@@ -132,6 +138,7 @@
 			return this.audioAdapter.getSpectrum();
 		},
 
+
 		isLoaded : function () {
 			return this.audioAdapter.isLoaded;
 		},
@@ -139,6 +146,7 @@
 		isPlaying : function () {
 			return this.audioAdapter.isPlaying;
 		},
+
 
 
 		/* Sections */
@@ -165,6 +173,7 @@
 			return this;
 		},
 
+
 		between : function ( startTime, endTime, callback ) {
 			var _this = this;
 			this.sections.push({
@@ -175,6 +184,7 @@
 			});
 			return this;
 		},
+
 
 		onceAt : function ( time, callback ) {
 			var
@@ -196,6 +206,7 @@
 		}
 	};
 
+
 	function update () {
 		for ( var i in this.sections ) {
 			if ( this.sections[ i ].condition() )
@@ -203,7 +214,9 @@
 		}
 	}
 
+
 	window.Dancer = Dancer;
+
 })();
 
 (function ( Dancer ) {
@@ -214,7 +227,9 @@
 		'wav' : 'audio/wav; codecs="1"',
 		'aac' : 'audio/mp4; codecs="mp4a.40.2"'
 	},
+	
 	audioEl = document.createElement( 'audio' );
+
 
 	Dancer.options = {};
 
@@ -226,34 +241,26 @@
 		}
 	};
 
-	Dancer.isSupported = function () {
-		if ( !window.Float32Array || !window.Uint32Array ) {
-			return null;
-		} else if ( !isUnsupportedSafari() && ( window.AudioContext || window.webkitAudioContext )) {
-			return 'webaudio';
-		} else if ( audioEl && audioEl.mozSetup ) {
-			return 'audiodata';
-		} else if ( FlashDetect.versionAtLeast( 9 ) ) {
-			return 'flash';
-		} else {
-			return '';
-		}
-	};
+
+
 
 	Dancer.canPlay = function ( type ) {
 		var canPlay = audioEl.canPlayType;
+		
 		return !!(
-			Dancer.isSupported() === 'flash' ?
-				type.toLowerCase() === 'mp3' :
-				audioEl.canPlayType &&
-				audioEl.canPlayType( CODECS[ type.toLowerCase() ] ).replace( /no/, ''));
+			audioEl.canPlayType &&
+			audioEl.canPlayType( CODECS[ type.toLowerCase() ] ).replace( /no/, '')
+		);
 	};
+
+
 
 	Dancer.addPlugin = function ( name, fn ) {
 		if ( Dancer.prototype[ name ] === undefined ) {
 			Dancer.prototype[ name ] = fn;
 		}
 	};
+
 
 	Dancer._makeSupportedPath = function ( source, codecs ) {
 		if ( !codecs ) { return source; }
@@ -266,18 +273,18 @@
 		return source;
 	};
 
+
 	Dancer._getAdapter = function ( instance ) {
-		switch ( Dancer.isSupported() ) {
-			case 'webaudio':
-				return new Dancer.adapters.webaudio( instance );
-			case 'audiodata':
-				return new Dancer.adapters.moz( instance );
-			case 'flash':
-				return new Dancer.adapters.flash( instance );
-			default:
-				return null;
-		}
+		
+		if (!window.Float32Array || !window.Uint32Array)
+			return null;
+		
+		if ( !isUnsupportedSafari() && ( window.AudioContext || window.webkitAudioContext ))
+			return new Dancer.adapters.webaudio( instance );
+
+		return null;
 	};
+
 
 	Dancer._getMP3SrcFromAudio = function ( audioEl ) {
 		var sources = audioEl.children;
@@ -287,6 +294,7 @@
 		}
 		return null;
 	};
+
 
 	// Browser detection is lame, but Safari 6 has Web Audio API,
 	// but does not support processing audio from a Media Element Source
@@ -298,6 +306,7 @@
 		version = version ? parseFloat( version[ 1 ] ) : 0;
 		return isApple && version <= 6;
 	}
+
 
 })( window.Dancer );
 
@@ -372,6 +381,14 @@
 	window.Dancer.Kick = Kick;
 })();
 
+/*
+
+Equalizer
+
+© Guillaume Gonnet
+License MIT
+
+*/
 (function() {
 
 
@@ -637,6 +654,11 @@
 		this.fft = new FFT( SAMPLE_SIZE, SAMPLE_RATE );
 		this.signal = new Float32Array( SAMPLE_SIZE );
 
+		// Analyser
+		this.analyser = this.context.createAnalyser();
+		this.analyser.smoothingTimeConstant = 0.1;
+		this.analyser.fftSize = 1024;
+
 
 
 		// Compressor
@@ -651,7 +673,7 @@
 		this.buffer = null;
 
 
-
+		this.lastPlaybackRate = 1;
 		this.isPlaying = false;
 
 		this._playbackStartTime = 0;
@@ -682,6 +704,7 @@
 			this.isPlaying = true;
 		},
 
+
 		pause : function () {
 			this.isPlaying = false;
 
@@ -691,9 +714,11 @@
 			this.dancer.trigger('pause');
 		},
 
+
 		setVolume : function ( volume ) {
 			this.eq.setGain(volume);
 		},
+
 
 		getVolume : function () {
 			return this.eq.gain.gain.value;
@@ -703,6 +728,7 @@
 		getWaveform : function () {
 			return this.signal;
 		},
+
 
 		getSpectrum : function () {
 			return this.fft.spectrum;
@@ -716,12 +742,14 @@
 				return this._offset;
 		},
 
+
 		setTime : function (val) {
 			this._offset = val;
 
 			if (this.isPlaying)
 				this.play();
 		},
+
 
 		getDuration : function () {
 			return  this.buffer ? this.buffer.duration : 0;
@@ -759,10 +787,22 @@
 
 
 		_createAndPlayAudioNode: function (startTime, offset) {
+			var _this = this;
+
 			this.audioNode = this.context.createBufferSource();
 			this.audioNode.buffer = this.buffer;
+
 			this.eq.plug(this.audioNode);
 			this.audioNode.connect(this.proc);
+			this.audioNode.connect(this.analyser);
+
+			this.audioNode.onended = function() {
+				_this.pause();
+				_this.setTime(0);
+				_this.dancer.trigger('end');
+			}
+
+			this.audioNode.playbackRate.value = this.lastPlaybackRate;
 
 			this.audioNode.startTime = startTime + this.buffer.duration;
 			this.audioNode.start(this.audioNode.startTime, offset, this.buffer.duration - offset);
@@ -772,474 +812,7 @@
 
 
 
-
 	Dancer.adapters.webaudiobuffer = adapter;
-
-})();
-
-(function() {
-
-	var adapter = function ( dancer ) {
-		this.dancer = dancer;
-		this.audio = new Audio();
-	};
-
-	adapter.prototype = {
-
-		load : function ( _source ) {
-			var _this = this;
-			this.audio = _source;
-
-			this.isLoaded = false;
-			this.progress = 0;
-
-			if ( this.audio.readyState < 3 ) {
-				this.audio.addEventListener( 'loadedmetadata', function () {
-					getMetadata.call( _this );
-				}, false);
-			} else {
-				getMetadata.call( _this );
-			}
-
-			this.audio.addEventListener( 'MozAudioAvailable', function ( e ) {
-				_this.update( e );
-			}, false);
-
-			this.audio.addEventListener( 'progress', function ( e ) {
-				if ( e.currentTarget.duration ) {
-					_this.progress = e.currentTarget.seekable.end( 0 ) / e.currentTarget.duration;
-				}
-			}, false);
-
-			return this.audio;
-		},
-
-		play : function () {
-			this.audio.play();
-			this.isPlaying = true;
-		},
-
-		pause : function () {
-			this.audio.pause();
-			this.isPlaying = false;
-		},
-
-		setVolume : function ( volume ) {
-			this.audio.volume = volume;
-		},
-
-		getVolume : function () {
-			return this.audio.volume;
-		},
-
-		getProgress : function () {
-			return this.progress;
-		},
-
-		getWaveform : function () {
-			return this.signal;
-		},
-
-		getSpectrum : function () {
-			return this.fft.spectrum;
-		},
-
-		getTime : function () {
-			return this.audio.currentTime;
-		},
-
-		getDuration : function () {
-			return this.audio.duration;
-		},
-
-		update : function ( e ) {
-			if ( !this.isPlaying || !this.isLoaded ) return;
-
-			for ( var i = 0, j = this.fbLength / 2; i < j; i++ ) {
-				this.signal[ i ] = ( e.frameBuffer[ 2 * i ] + e.frameBuffer[ 2 * i + 1 ] ) / 2;
-			}
-
-			this.fft.forward( this.signal );
-			this.dancer.trigger( 'update' );
-		}
-	};
-
-	function getMetadata () {
-		this.fbLength = this.audio.mozFrameBufferLength;
-		this.channels = this.audio.mozChannels;
-		this.rate     = this.audio.mozSampleRate;
-		this.fft      = new FFT( this.fbLength / this.channels, this.rate );
-		this.signal   = new Float32Array( this.fbLength / this.channels );
-		this.isLoaded = true;
-		this.progress = 1;
-		this.dancer.trigger( 'loaded' );
-	}
-
-	Dancer.adapters.moz = adapter;
-
-})();
-
-(function() {
-	var
-		SAMPLE_SIZE  = 1024,
-		SAMPLE_RATE  = 44100,
-		smLoaded     = false,
-		smLoading    = false,
-		CONVERSION_COEFFICIENT = 0.93;
-
-	var adapter = function ( dancer ) {
-		this.dancer = dancer;
-		this.wave_L = [];
-		this.wave_R = [];
-		this.spectrum = [];
-		window.SM2_DEFER = true;
-	};
-
-	adapter.prototype = {
-		// `source` can be either an Audio element, if supported, or an object
-		// either way, the path is stored in the `src` property
-		load : function ( source ) {
-			var _this = this;
-			this.path = source ? source.src : this.path;
-
-			this.isLoaded = false;
-			this.progress = 0;
-
-			!window.soundManager && !smLoading && loadSM.call( this );
-
-			if ( window.soundManager ) {
-				this.audio = soundManager.createSound({
-					id       : 'dancer' + Math.random() + '',
-					url      : this.path,
-					stream   : true,
-					autoPlay : false,
-					autoLoad : true,
-					whileplaying : function () {
-						_this.update();
-					},
-					whileloading : function () {
-						_this.progress = this.bytesLoaded / this.bytesTotal;
-					},
-					onload   : function () {
-						_this.fft = new FFT( SAMPLE_SIZE, SAMPLE_RATE );
-						_this.signal = new Float32Array( SAMPLE_SIZE );
-						_this.waveform = new Float32Array( SAMPLE_SIZE );
-						_this.isLoaded = true;
-						_this.progress = 1;
-						_this.dancer.trigger( 'loaded' );
-					}
-				});
-				this.dancer.audio = this.audio;
-			}
-
-			// Returns audio if SM already loaded -- otherwise,
-			// sets dancer instance's audio property after load
-			return this.audio;
-		},
-
-		play : function () {
-			this.audio.play();
-			this.isPlaying = true;
-		},
-
-		pause : function () {
-			this.audio.pause();
-			this.isPlaying = false;
-		},
-
-		setVolume : function ( volume ) {
-			this.audio.setVolume( volume * 100 );
-		},
-
-		getVolume : function () {
-			return this.audio.volume / 100;
-		},
-
-		getProgress : function () {
-			return this.progress;
-		},
-
-		getWaveform : function () {
-			return this.waveform;
-		},
-
-		getSpectrum : function () {
-			return this.fft.spectrum;
-		},
-
-		getTime : function () {
-			return this.audio.position / 1000;
-		},
-
-		getDuration : function () {
-			return this.audio.duration;
-		},
-
-		update : function () {
-			if ( !this.isPlaying && !this.isLoaded ) return;
-			this.wave_L = this.audio.waveformData.left;
-			this.wave_R = this.audio.waveformData.right;
-			var avg;
-			for ( var i = 0, j = this.wave_L.length; i < j; i++ ) {
-				avg = parseFloat(this.wave_L[ i ]) + parseFloat(this.wave_R[ i ]);
-				this.waveform[ 2 * i ]     = avg / 2;
-				this.waveform[ i * 2 + 1 ] = avg / 2;
-				this.signal[ 2 * i ]       = avg * CONVERSION_COEFFICIENT;
-				this.signal[ i * 2 + 1 ]   = avg * CONVERSION_COEFFICIENT;
-			}
-
-			this.fft.forward( this.signal );
-			this.dancer.trigger( 'update' );
-		}
-	};
-
-	function loadSM () {
-		var adapter = this;
-		smLoading = true;
-		loadScript( Dancer.options.flashJS, function () {
-			soundManager = new SoundManager();
-			soundManager.flashVersion = 9;
-			soundManager.flash9Options.useWaveformData = true;
-			soundManager.useWaveformData = true;
-			soundManager.useHighPerformance = true;
-			soundManager.useFastPolling = true;
-			soundManager.multiShot = false;
-			soundManager.debugMode = false;
-			soundManager.debugFlash = false;
-			soundManager.url = Dancer.options.flashSWF;
-			soundManager.onready(function () {
-				smLoaded = true;
-				adapter.load();
-			});
-			soundManager.ontimeout(function(){
-				console.error( 'Error loading SoundManager2.swf' );
-			});
-			soundManager.beginDelayedInit();
-		});
-	}
-
-	function loadScript ( url, callback ) {
-		var
-			script   = document.createElement( 'script' ),
-			appender = document.getElementsByTagName( 'script' )[0];
-		script.type = 'text/javascript';
-		script.src = url;
-		script.onload = callback;
-		appender.parentNode.insertBefore( script, appender );
-	}
-
-	Dancer.adapters.flash = adapter;
-
-})();
-
-(function() {
-	var
-		SAMPLE_SIZE = 2048,
-		SAMPLE_RATE = 44100;
-
-	var zero_array = new Float32Array(SAMPLE_SIZE);
-	var position = 0, rate = 1, beeping = false;
-
-
-	var adapter = function ( dancer ) {
-		var _this = this;
-
-		this.dancer = dancer;
-		this.context = window.AudioContext ?
-			new window.AudioContext() :
-			new window.webkitAudioContext();
-
-
-		if (!this.context.createScriptProcessor)
-			this.context.createScriptProcessor = this.context.createJavascriptNode;
-		
-		this.proc = this.context.createScriptProcessor( SAMPLE_SIZE, 0, 2 );
-
-		this.proc.onaudioprocess = function ( e ) {
-			_this.update.call( _this, e );
-		};
-
-
-		// FFT
-		this.fft = new FFT( SAMPLE_SIZE, 1 );
-		this.signal = new Float32Array( SAMPLE_SIZE );
-
-		// Equalizer
-		this.eq = new Dancer.EQ( this.context, this.proc );
-		this.eq.connect( this.context.destination );
-
-		this.buffer = null;
-
-
-
-		this.position = 0;
-		this.rate = 1;
-		this.isPlaying = false;
-
-	};
-
-
-	adapter.prototype = {
-
-		load : function ( audio ) {
-			
-			this.dancer.audioAdapter = Dancer._getAdapter(this.dancer);
-			return this.dancer.load(audio);
-		},
-
-
-		play : function () {
-			this.isPlaying = true;
-			this.dancer.trigger('play');
-		},
-
-		pause : function () {
-			this.isPlaying = false;
-			this.dancer.trigger('pause');
-		},
-
-		setVolume : function ( volume ) {
-			this.eq.setGain(volume);
-		},
-
-		getVolume : function () {
-			return this.eq.gain.gain.value;
-		},
-
-		
-		getWaveform : function () {
-			return this.signal;
-		},
-
-		getSpectrum : function () {
-			return this.fft.spectrum;
-		},
-
-		getTime : function () {
-			return this.buffer ? this.position / this.buffer.sampleRate : 0;
-		},
-
-		setTime : function (val) {
-			this.position = this.buffer ? this.buffer.sampleRate * val : 0;
-		},
-
-		getDuration : function () {
-			return  this.buffer ? this.buffer.duration : null;
-		},
-
-
-		update : function ( e ) {
-
-			get_samples.call( this, e );
-
-
-			if (!this.isPlaying) return;
-
-
-			var channels = 2,
-				resolution = SAMPLE_SIZE,
-
-				sum = function ( prev, curr ) {
-					return prev[ i ] + curr[ i ];
-				}, i;
-
-			var input_channels = new Array(2)
-			input_channels[0] = e.outputBuffer.getChannelData(0);
-			input_channels[1] = e.outputBuffer.getChannelData(1);
-
-			for ( i = 0; i < resolution; i++ ) {
-				this.signal[ i ] = channels > 1 ?
-					input_channels.reduce( sum ) / channels :
-					input_channels[ 0 ][ i ];
-			}
-
-			this.fft.forward( this.signal );
-			
-
-
-			this.dancer.trigger('update');
-		}
-	};
-
-
-
-
-
-	function process_samples (input_start, run_down_size, input_channels, output_start, output_channels)  {
-
-		while (--run_down_size >= 0) {
-
-			var source_offset_float = input_start + (run_down_size * this.rate),
-				source_offset = Math.round(source_offset_float);
-
-			var destination_offset = output_start + run_down_size;
-
-			var sample_l = input_channels[0][source_offset],
-				sample_r = input_channels[1][source_offset];
-
-
-			output_channels[0][destination_offset] = sample_l;
-			output_channels[1][destination_offset] = sample_r;
-
-		}
-	}
-
-
-
-
-
-
-
-
-
-	function get_samples (e) {
-
-		var output_channels = new Array(2);
-		output_channels[0] = e.outputBuffer.getChannelData(0);
-		output_channels[1] = e.outputBuffer.getChannelData(1);
-
-		if (this.isPlaying && this.buffer) {
-
-			input_channels = new Array(2)
-			input_channels[0] = this.buffer.getChannelData(0);
-			input_channels[1] = this.buffer.getChannelData(1);
-
-			// Dont sample beyond the end of input
-			end_position = (SAMPLE_SIZE * this.rate) + this.position;
-			edge_distance = this.buffer.length - (end_position + 4);
-
-			if (this.position < 0) {
-				// If we are below 0 position, play nothing and increase the position like normal
-				output_channels[0].set(zero_array);
-				output_channels[1].set(zero_array);
-				this.position = end_position;
-			}
-
-			else if (edge_distance <= 0) {
-				// Stop playback if the end is reached
-				this.isPlaying = false;
-				output_channels[0].set(zero_array);
-				output_channels[1].set(zero_array);
-			}
-
-			else {
-				process_samples.call(this, this.position, SAMPLE_SIZE, input_channels, 0, output_channels);
-				this.position = ((SAMPLE_SIZE * this.rate) + this.position);
-			}
-
-		}
-
-		else {
-			output_channels[0].set(zero_array);
-			output_channels[1].set(zero_array);
-		}
-	}
-
-
-
-
-
-	Dancer.adapters.drop = adapter;
 
 })();
 
@@ -1411,204 +984,3 @@ FFT.prototype.forward = function(buffer) {
 
 	return this.calculateSpectrum();
 };
-
-/*
-Copyright (c) Copyright (c) 2007, Carl S. Yestrau All rights reserved.
-Code licensed under the BSD License: http://www.featureblend.com/license.txt
-Version: 1.0.4
-*/
-var FlashDetect = new function(){
-    var self = this;
-    self.installed = false;
-    self.raw = "";
-    self.major = -1;
-    self.minor = -1;
-    self.revision = -1;
-    self.revisionStr = "";
-    var activeXDetectRules = [
-        {
-            "name":"ShockwaveFlash.ShockwaveFlash.7",
-            "version":function(obj){
-                return getActiveXVersion(obj);
-            }
-        },
-        {
-            "name":"ShockwaveFlash.ShockwaveFlash.6",
-            "version":function(obj){
-                var version = "6,0,21";
-                try{
-                    obj.AllowScriptAccess = "always";
-                    version = getActiveXVersion(obj);
-                }catch(err){}
-                return version;
-            }
-        },
-        {
-            "name":"ShockwaveFlash.ShockwaveFlash",
-            "version":function(obj){
-                return getActiveXVersion(obj);
-            }
-        }
-    ];
-    /**
-     * Extract the ActiveX version of the plugin.
-     * 
-     * @param {Object} The flash ActiveX object.
-     * @type String
-     */
-    var getActiveXVersion = function(activeXObj){
-        var version = -1;
-        try{
-            version = activeXObj.GetVariable("$version");
-        }catch(err){}
-        return version;
-    };
-    /**
-     * Try and retrieve an ActiveX object having a specified name.
-     * 
-     * @param {String} name The ActiveX object name lookup.
-     * @return One of ActiveX object or a simple object having an attribute of activeXError with a value of true.
-     * @type Object
-     */
-    var getActiveXObject = function(name){
-        var obj = -1;
-        try{
-            obj = new ActiveXObject(name);
-        }catch(err){
-            obj = {activeXError:true};
-        }
-        return obj;
-    };
-    /**
-     * Parse an ActiveX $version string into an object.
-     * 
-     * @param {String} str The ActiveX Object GetVariable($version) return value. 
-     * @return An object having raw, major, minor, revision and revisionStr attributes.
-     * @type Object
-     */
-    var parseActiveXVersion = function(str){
-        var versionArray = str.split(",");//replace with regex
-        return {
-            "raw":str,
-            "major":parseInt(versionArray[0].split(" ")[1], 10),
-            "minor":parseInt(versionArray[1], 10),
-            "revision":parseInt(versionArray[2], 10),
-            "revisionStr":versionArray[2]
-        };
-    };
-    /**
-     * Parse a standard enabledPlugin.description into an object.
-     * 
-     * @param {String} str The enabledPlugin.description value.
-     * @return An object having raw, major, minor, revision and revisionStr attributes.
-     * @type Object
-     */
-    var parseStandardVersion = function(str){
-        var descParts = str.split(/ +/);
-        var majorMinor = descParts[2].split(/\./);
-        var revisionStr = descParts[3];
-        return {
-            "raw":str,
-            "major":parseInt(majorMinor[0], 10),
-            "minor":parseInt(majorMinor[1], 10), 
-            "revisionStr":revisionStr,
-            "revision":parseRevisionStrToInt(revisionStr)
-        };
-    };
-    /**
-     * Parse the plugin revision string into an integer.
-     * 
-     * @param {String} The revision in string format.
-     * @type Number
-     */
-    var parseRevisionStrToInt = function(str){
-        return parseInt(str.replace(/[a-zA-Z]/g, ""), 10) || self.revision;
-    };
-    /**
-     * Is the major version greater than or equal to a specified version.
-     * 
-     * @param {Number} version The minimum required major version.
-     * @type Boolean
-     */
-    self.majorAtLeast = function(version){
-        return self.major >= version;
-    };
-    /**
-     * Is the minor version greater than or equal to a specified version.
-     * 
-     * @param {Number} version The minimum required minor version.
-     * @type Boolean
-     */
-    self.minorAtLeast = function(version){
-        return self.minor >= version;
-    };
-    /**
-     * Is the revision version greater than or equal to a specified version.
-     * 
-     * @param {Number} version The minimum required revision version.
-     * @type Boolean
-     */
-    self.revisionAtLeast = function(version){
-        return self.revision >= version;
-    };
-    /**
-     * Is the version greater than or equal to a specified major, minor and revision.
-     * 
-     * @param {Number} major The minimum required major version.
-     * @param {Number} (Optional) minor The minimum required minor version.
-     * @param {Number} (Optional) revision The minimum required revision version.
-     * @type Boolean
-     */
-    self.versionAtLeast = function(major){
-        var properties = [self.major, self.minor, self.revision];
-        var len = Math.min(properties.length, arguments.length);
-        for(i=0; i<len; i++){
-            if(properties[i]>=arguments[i]){
-                if(i+1<len && properties[i]==arguments[i]){
-                    continue;
-                }else{
-                    return true;
-                }
-            }else{
-                return false;
-            }
-        }
-    };
-    /**
-     * Constructor, sets raw, major, minor, revisionStr, revision and installed public properties.
-     */
-    self.FlashDetect = function(){
-        if(navigator.plugins && navigator.plugins.length>0){
-            var type = 'application/x-shockwave-flash';
-            var mimeTypes = navigator.mimeTypes;
-            if(mimeTypes && mimeTypes[type] && mimeTypes[type].enabledPlugin && mimeTypes[type].enabledPlugin.description){
-                var version = mimeTypes[type].enabledPlugin.description;
-                var versionObj = parseStandardVersion(version);
-                self.raw = versionObj.raw;
-                self.major = versionObj.major;
-                self.minor = versionObj.minor; 
-                self.revisionStr = versionObj.revisionStr;
-                self.revision = versionObj.revision;
-                self.installed = true;
-            }
-        }else if(navigator.appVersion.indexOf("Mac")==-1 && window.execScript){
-            var version = -1;
-            for(var i=0; i<activeXDetectRules.length && version==-1; i++){
-                var obj = getActiveXObject(activeXDetectRules[i].name);
-                if(!obj.activeXError){
-                    self.installed = true;
-                    version = activeXDetectRules[i].version(obj);
-                    if(version!=-1){
-                        var versionObj = parseActiveXVersion(version);
-                        self.raw = versionObj.raw;
-                        self.major = versionObj.major;
-                        self.minor = versionObj.minor; 
-                        self.revision = versionObj.revision;
-                        self.revisionStr = versionObj.revisionStr;
-                    }
-                }
-            }
-        }
-    }();
-};
-FlashDetect.JS_RELEASE = "1.0.4";

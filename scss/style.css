@@ -33,48 +33,6 @@ body {
 
 
 
-#ffts .fft {
-	display: none;
-	position: relative;
-}
-
-.optionFft {
-	display: none;
-	width: 200px;
-	height: 200px;
-	background: rgb(91, 170, 91);;
-	position: absolute;
-	top: 20px;
-	left: 20px;
-	z-index: 999;
-	border-radius: 5px;
-}
-
-.optionFft h3 {
-	text-align: center;
-	padding: 5px 0;
-	color: #16460F;
-	height: 20px;
-	font-size: 20px;
-	line-height: 20px;
-	background: rgb(43, 129, 61);
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
-	font-weight: bold;
-	cursor: move;
-}
-
-
-
-
-/* FFTs Options */
-
-#fft1 .slider1 {
-	margin: 10px;
-}
-
-
-
 
 
 
@@ -104,17 +62,3 @@ body {
 
 
 
-
-
-#eq {
-	display: none;
-	width: 250px;
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	background: #4A3F5A;
-	overflow: hidden;
-	box-shadow: #353535 0px 0px 8px 2px;
-	z-index: 999999;
-}

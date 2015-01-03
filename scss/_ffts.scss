@@ -1,0 +1,169 @@
+/*
+
+FFts
+
+*/
+
+
+
+
+// General
+
+.fft {
+	display: none;
+	position: relative;
+}
+
+
+
+
+
+
+
+// Menu FFT
+
+#optionsFFT {
+	
+	.info {
+		text-align: center;
+	}
+
+}
+
+
+
+
+
+
+
+// FFT 0
+
+#fft0Title, #fft0BPM {
+	display: none;
+	position: absolute;
+	top: 100px;
+	right: 130px;
+	font-size: 35px;
+	color: #FFF;
+}
+
+#fft0BPM {
+	top: 145px;
+	font-size: 20px;
+}
+
+
+
+
+
+// FFT 1
+
+#fft1 {
+	cursor: none;
+}
+
+
+
+
+
+
+// FFT 2
+
+@-webkit-keyframes fftPlayerR {
+	0% { -webkit-transform: scale(.6); }
+	50% { -webkit-transform: scale(1.2); }
+	100% { -webkit-transform: scale(.6); }
+}
+
+
+@keyframes fftPlayerR {
+	0% { -webkit-transform: scale(.5); }
+	50% { -webkit-transform: scale(1); }
+	100% { -webkit-transform: scale(.5); }
+}
+
+
+#fft2 {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+
+	img {
+		position: absolute;
+		max-width: 100%;
+		//max-height: 100%;
+	}
+}
+
+
+
+#fft2Music {
+	position: absolute;
+	top: 100px;
+	left: 0;
+	right: 0;
+}
+
+
+#fft2Progress {
+	margin: 0 auto;
+	width: 700px;
+	height: 3px;
+	border-radius: 2px;
+	background: #FFF;
+	position: relative;
+	cursor: pointer;
+}
+
+
+#fft2Point {
+
+	position: absolute;
+
+	canvas {
+		position: absolute;
+		top: -19px;
+		margin-left: -19px;
+	}
+
+	div {
+		position: absolute;
+		width: 100px;
+		height: 100px;
+		background: rgba(255, 249, 249, 0.26);
+		top: -49px;
+		left: -49px;
+		border-radius: 50px;
+		-webkit-animation: fftPlayerR 2s ease-in-out infinite;
+		animation: fftPlayerR 2s ease-in-out infinite;
+	}
+}
+
+
+#fft2Times {
+	margin: 0 auto;
+	width: 650px;
+	margin-top: 20px;
+	color: #FFF;
+	font-size: 22px;
+}
+
+#fft2TimeElapsed {
+	float: left;
+}
+
+#fft2TimeLeft {
+	float: right;
+}
+
+
+
+
+
+
+// FFT 3
+
+#fft3 {
+	background: #000;
+	cursor: none;
+}
