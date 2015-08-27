@@ -1,6 +1,7 @@
 /*
 
-Fichier de gestion du glisser/déposer
+Manage drops of music file
+
 
 © Guillaume Gonnet
 License GPLv2
@@ -9,10 +10,23 @@ License GPLv2
 
 
 
-var dragging = 0, $dropHelp = $("#dropMusic");
+
+// Namespace
+var DropMusic = {};
 
 
-// Events Drop
+
+// JQuery
+var $dropHelp = $("#dropMusic");
+var $songsContainer = $("#songs");
+
+
+
+
+// Drop Events
+
+var dragging = 0;
+
 
 $(window).bind("dragenter", function(e) {
 	e.preventDefault();
@@ -48,13 +62,9 @@ window.addEventListener("drop", function (e) {
 	e.stopPropagation();
 
 	for (var i = 0; i < e.dataTransfer.files.length; i++)
-		readFile(e.dataTransfer.files[i]);
+		DropMusic.load(e.dataTransfer.files[i]);
 
 	$dropHelp.fadeOut();
-	Menu.open();
-	setTimeout(function() {
-		$(window).mousemove(onMouseMove);
-	}, 2000);
 
 	dragging = 0;
 }, false);
@@ -63,70 +73,117 @@ window.addEventListener("drop", function (e) {
 
 
 
-$songsContainer = $("#songs");
 
 
-// Read the music file
-function readFile(file) {
+
+
+
+
+
+
+// Load a music file
+
+DropMusic.load = function(file) {
+
+	if (MusicMenu.storage == "buffered")
+		return DropMusic.loadBufferd(file);
+
+	else if (MusicMenu.storage == "blob")
+		return DropMusic.loadBlob(file);
+
+
+	var ext = file.name.substr(file.name.lastIndexOf('.') + 1).toLocaleLowerCase();
+
+	if (ext == 'flac')
+		DropMusic.loadBufferd(file);
+	else
+		DropMusic.loadBlob(file);
+};
+
+
+
+
+
+
+
+// Create a blob with the file
+
+DropMusic.loadBlob = function(file) {
+
+	var audio = new Audio();
+	audio.src = window.URL.createObjectURL(file);
+
+
+	var song = Playlist.add({
+		type: 'blob',
+		name: file.name.substr(0, file.name.lastIndexOf('.')) || file.name,
+		audio: audio
+	});
+};
+
+
+
+
+
+
+
+// Read the file and store it in a buffer
+
+DropMusic.loadBufferd = function(file) {
 
 
 	var fr = new FileReader();
-	var name = file.name.substr(0, file.name.lastIndexOf('.')) || file.name;
 
 
-	// Elements in the menu
-	var $elem = $('<div></div>'),
-		$del = $('<p class="del">x</p>'),
-		$name = $('<p class="name">' + name + '</p>'),
-		$duration = $('<p class="duration"></p>');
-	
-
-	// Loader
-	var $loader = $('<div class="loader1"></div>');
-	for (var i = 1; i < 9; i++)
-		$loader.append('<div class="rotateG_0'+i+'"></div>');
-
-	$songsContainer.append($elem.append([ $del, $name, $loader, $duration ]));
+	var song = Playlist.add({
+		type: 'buffered',
+		name: file.name.substr(0, file.name.lastIndexOf('.')) || file.name
+	});
 
 
 
 	fr.onload = function(e) {
-		var fileResult = e.target.result;
 		
-		adapter.context.decodeAudioData(fileResult, function(buffer) {
+		var fileResult = e.target.result,
+			fileResult2 = fileResult.slice(0);
 
-			// Decode OK
-			var i = Player.playlist.add({ name: file.name, buffer: buffer, elem: $elem });
 
-			$loader.remove();
-			$duration.text(parseTime(buffer.duration));
+		// Callback: add song to playlist
+		function success(buffer) {
 
-			$elem.click(function() {
-				Player.play(i);
+			fileResult = fileResult2 = null;
+
+			song.buffer = buffer;
+
+			Playlist.update(song);
+		}
+		
+
+		// Use AudioContext.decodeAudioData to decode the file
+		Dancer.context.decodeAudioData(fileResult, success, function() {
+
+			// If AudioContext.decodeAudioData can't, try with js (for FLAC...)
+			Decoder.decodeAudioData(fileResult2, success, function(e) {
+				
+				fileResult = fileResult2 = null;
+
+				// Error
+				Playlist.remove(song);
+				alert(t('incompatible file'));
 			});
 
-
-		}, function(e) {
-
-			// Error
-			$elem.remove();
-			alert(t('incompatible file'));
 		});
+
 
 	};
 
 
 	fr.onerror = function(e) {
+		Playlist.remove(song);
 		alert(t('cant read file'));
 	};
 
 	
 	fr.readAsArrayBuffer(file);
 
-}
-
-
-
-
-// Show drop message at start
-$dropHelp.fadeIn();
+};

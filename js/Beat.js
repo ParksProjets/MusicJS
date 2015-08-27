@@ -2,6 +2,7 @@
 
 Beat
 
+
 © Guillaume Gonnet
 License GPLv2
 
@@ -22,16 +23,18 @@ License GPLv2
 
 	BPM.on = function() {
 		active = true;
+		dancer.bind("update", update);
 	}
 
 	BPM.off = function() {
 		active = false;
+		dancer.unbind("update", update);
 	}
 
 
 
 	function onPlay() {
-		var song = Player.playlist.get();
+		var song = Playlist.get();
 		dt = 0;
 
 		if (!song.bpm)
@@ -61,9 +64,9 @@ License GPLv2
 
 
 	dancer.bind("play", onPlay);
-	dancer.bind("update", update);
 
 })();
+
 
 
 

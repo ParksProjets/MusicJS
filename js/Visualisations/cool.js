@@ -1,6 +1,10 @@
 /*
 
-FFT 2
+Cool
+
+
+© Guillaume Gonnet
+License GPLv2
 
 */
 
@@ -115,9 +119,13 @@ FFT 2
 	var fft = {
 
 		onPlay: function() {
+			
+			if (!isPlaying)
+				requestAnimationFrame(animate);
+
 			isPlaying = true;
-			requestAnimationFrame(animate);
 		},
+
 
 		onPause: function() {
 			isPlaying = false;

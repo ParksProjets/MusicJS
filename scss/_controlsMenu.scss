@@ -14,10 +14,10 @@ Controls Menu
 	position: absolute;
 	top: 0;
 	bottom: 0;
-	right: -260px;
+	right: 0;
 	background: rgb(74, 63, 90);
 	overflow: hidden;
-	transition: right 1s;
+	//transition: right 1s;
 	box-shadow: rgb(53, 53, 53) 0px 0px 8px 2px;
 	z-index: 999999;
 
@@ -31,6 +31,8 @@ Controls Menu
 	}
 
 }
+
+
 
 
 
@@ -70,6 +72,8 @@ Controls Menu
 #play {
 	margin-left: 5px;
 }
+
+
 
 
 
@@ -126,6 +130,7 @@ Controls Menu
 
 
 
+
 // Others buttons
 
 #buttons {
@@ -155,96 +160,136 @@ Controls Menu
 
 
 
+
+
+
+
+
+
 // Songs
 
 #songs {
 	
 	border-top: 1px solid #140F27;
+}
 
 
-	> div {
+#helpSongs {
+	padding: 15px 22px;
+	color: #FFF;
+	font-size: 18px;
+}
+
+
+
+
+.song {
 		
-		padding: 3px 5px;
-		height: 26px;
-		background: rgba(0, 0, 0, 0.21);
-		border-bottom: 1px solid #140F27;
-		transition: background .4s;
-		cursor: pointer;
+	padding: 3px 5px;
+	height: 26px;
+	background: rgba(0, 0, 0, 0.21);
+	border-bottom: 1px solid #140F27;
+	transition: background .4s;
+	position: relative;
+	cursor: pointer;
+
+
+	&:hover {
+		background: rgba(233, 233, 233, 0.15);
+	}
+
+
+	p {
+		color: #E6E6E6;
+		font-size: 16px;
+		line-height: 25px;
+		float: left;
 	
+		&.del {
+			position: absolute;
+			font-size: 10px;
+			margin-right: 6px;
+			right: -20px;
+			transition: right .5s;
+		}
+
+		&.name {
+			max-width: 176px;
+			overflow: hidden;
+			height: 100%;
+		}
+	}
+
+
+	p.duration, .loader1 {
+		float: right;
+		opacity: 1;
+		transition: opacity .3s;
+	}
+
+
+
+	&.clone {
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 9999999999;
+
+		background: rgba(56, 47, 68, 0.86);
+		border-bottom: 1px solid rgba(0, 0, 0, 0);
 
 		&:hover {
-			background: rgba(233, 233, 233, 0.15);
+			background: inherit;
 		}
+	}
 
 
-		p {
-			color: #E6E6E6;
-			font-size: 16px;
-			line-height: 25px;
-			float: left;
-		
-			&.del {
-				float: left;
-				//font-family: 'icomoon';
-				font-size: 10px;
-				margin-right: 6px;
-			}
 
-			&.name {
-				max-width: 176px;
-				overflow: hidden;
-				height: 100%;
-			}
+	&.holder {
+		background-color: #4A3F5A;
+    	border: 2px dashed #FBFBFB;
+
+    	&:hover {
+			background: inherit;
 		}
-
-
-		p.duration, .loader1 {
-			float: right;
-		}
-
 	}
 }
 
 
 
 
-// Help Button
+#songs.edit, .song.clone {
 
-#helpBtn {
+	.duration {
+		opacity: 0;
+	}
+
+
+	.del {
+	    right: 6px;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Manage Playlist Button
+
+#managePlayBtn {
 	position: absolute;
-	bottom: 32px;
+	bottom: 5px;
 	text-align: center;
 	left: 0;
 	right: 0;
 	color: #FFF;
 	cursor: pointer;
-}
-
-
-
-// Options
-
-#params {
-
-	bottom: -103px;
-	position: absolute;
-	width: 190px;
-	left: 0;
-	padding-bottom: 13px;
-	margin: 0 30px;
-
-	h3 {
-		text-align: center;
-		height: 22px;
-		margin-bottom: 3px;
-		cursor: default;
-	}
-
-	a {
-		display: block;
-		color: #FFF;
-		cursor: pointer;
-		line-height: 30px;
-	}
-
 }

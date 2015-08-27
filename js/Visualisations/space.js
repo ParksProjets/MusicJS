@@ -1,6 +1,9 @@
 /*
 
-FFT 3
+Space
+
+
+Taken form:
 http://airtightinteractive.com/demos/js/reactive/
 
 */

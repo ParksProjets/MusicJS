@@ -2,6 +2,7 @@
 
 Player
 
+
 © Guillaume Gonnet
 License GPLv2
 
@@ -19,51 +20,6 @@ Player.mode = 'next';
 
 
 
-// Playlist
-
-Player.playlist = [];
-
-
-Player.playlist.get = function(index) {
-	return Player.playlist[ (index || Player.current) - 1];
-}
-
-
-Player.playlist.getNextIndex = function() {
-
-	if (Player.current < Player.playlist.length)
-		return Player.current + 1;
-	else
-		return 0;
-}
-
-
-
-Player.playlist.add = function(obj) {
-
-	var song = {
-		fileName: obj.name,
-		name: obj.name.substr(0, obj.name.lastIndexOf('.')) || obj.name,
-		buffer: obj.buffer,
-		elem: obj.elem,
-		bpm: null
-	};
-
-
-	BeatDetector.run(song);
-
-	return Player.playlist.push(song);
-}
-
-
-
-Player.playlist.remove = function(i) {
-
-	return Player.playlist.slice(1, i);
-}
-
-
-
 
 
 // Commands
@@ -73,15 +29,26 @@ Player.play = function(index) {
 	if (typeof index == 'undefined' && Player.current)
 		return dancer.play();
 
-	if (typeof index == 'string' || (!Player.current && !index))
+
+	if (!Playlist.songs.length)
+		return;
+
+
+	if (typeof index == 'object')
+		index = Playlist.songs.indexOf(index) + 1;
+
+	if (index <= 0 || typeof index == 'string' || (!Player.current && !index))
 		index = 1;
+
 
 	Player.current = index;
 
+
 	dancer.pause();
 	dancer.setTime(0);
-	adapter.buffer = Player.playlist[index - 1].buffer;
+	dancer.audioAdapter = adapter = Playlist.getAdapter(Player.current);
 	dancer.play();
+
 }
 
 
@@ -107,7 +74,7 @@ Player.stop = function() {
 
 Player.next = function() {
 
-	if (Player.current < Player.playlist.length)
+	if (Player.current < Playlist.songs.length)
 		Player.play(Player.current + 1);
 };
 
@@ -123,21 +90,19 @@ Player.last = function() {
 
 
 
+
 // Crossfade
 
 (function() {
 
 	var CF = window.Player.Crossfade = {};
 
-
 	var active = false;
 
 	CF.time = 5;
 
 
-
 	var prevAdapter = null;
-
 	var fakeEvents = {};
 
 	var fakeDancer = { trigger: function(n) {
@@ -150,19 +115,16 @@ Player.last = function() {
 		if (prevAdapter)
 			return;
 
-		var i = Player.playlist.getNextIndex();
+		var i = Playlist.getNextIndex();
 		if (!i) return;
 
 		Player.current = i;
-		var song = Player.playlist[i-1];
 
 
-		var adpt = new Dancer.adapters.webaudiobuffer(dancer);
-		adpt.buffer = song.buffer;
-
+		var adpt = Playlist.getAdapter(i, true);
 
 		adpt.eq.gain.gain.linearRampToValueAtTime(0, 0);
-		adpt.eq.gain.gain.linearRampToValueAtTime(1, CF.time);
+		adpt.eq.gain.gain.linearRampToValueAtTime(1, CF.time * 1.5);
 
 		adapter.eq.gain.gain.linearRampToValueAtTime(1, adapter.context.currentTime);
 		adapter.eq.gain.gain.linearRampToValueAtTime(0, adapter.context.currentTime + CF.time);
@@ -185,11 +147,9 @@ Player.last = function() {
 	};
 
 
-
 	function update() {
 
-		if (!active)
-			return;
+		if (!active) return;
 
 		if (dancer.getDuration() - dancer.getTime() <= CF.time)
 			run();
@@ -202,13 +162,12 @@ Player.last = function() {
 	};
 
 
-
 	CF.off = function() {
 		active = false;
 	};
 
 
-	CF.on();
+	//CF.on();
 	dancer.bind("update", update);
 
 })();

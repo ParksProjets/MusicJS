@@ -2,7 +2,13 @@
 
 Utils
 
+
+© Guillaume Gonnet
+License GPLv2
+
 */
+
+
 
 
 // Noise
@@ -81,14 +87,19 @@ var ImprovedNoise = function () {
 
 
 
+
+
 // Animation Frame
 
 var vendors = ['ms', 'moz', 'webkit', 'o'];
+
 for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
 	window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
-	window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame']
-							   || window[vendors[x]+'CancelRequestAnimationFrame'];
+	window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
 }
+
+
+
 
 
 
@@ -102,6 +113,10 @@ function parseTime(time) {
 
 	return ((min < 10) ? "0" + min : min) + ":" + ((sec < 10) ? "0" + sec : sec);
 }
+
+
+
+
 
 
 

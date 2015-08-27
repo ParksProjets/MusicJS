@@ -1,0 +1,61 @@
+/*
+
+Source Menu
+
+*/
+
+
+
+#sourceMenu {
+
+
+	input[type=text] {
+		line-height: 25px;
+		outline: none;
+		margin: 0px 19px;
+		display: block;
+		width: 200px;
+	}
+
+}
+
+
+
+#sourceSoundcloud, #sourceURL {
+	display: none;
+}
+
+
+
+#sourceSoundcloud {
+
+	input[type=text] {
+		margin-bottom: 15px;
+	}
+
+
+	> div {
+		height: 36px;
+		background: #57476E;
+		padding: 10px;
+		cursor: pointer;
+
+		&:nth-child(odd) {
+			background: #776394;
+		}
+	}
+
+
+	h6 {
+		color: #FFF;
+		font-size: 13px;
+		overflow: hidden;
+		height: 16px;
+	}
+
+
+	small {
+		font-size: 12px;
+	}
+
+}

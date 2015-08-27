@@ -2,6 +2,7 @@
 
 Translation French/English
 
+
 © Guillaume Gonnet
 License GPLv2
 
@@ -40,7 +41,13 @@ Translation['en'] = {
 
 	'general options': 'General options',
 
+	'manage playlist': 'Manage the playlist',
+
+	'end editing': 'End editing',
+
 	'show title': 'Show title',
+
+	'help songs': 'Drop a music file in the page or open the Source Menu (move your mouse on the left).',
 
 	'none': 'None',
 
@@ -70,7 +77,13 @@ Translation['fr'] = {
 
 	'general options': 'Options générales',
 
+	'manage playlist': 'Modifier la playlist',
+
+	'end editing': 'Fin de la modification',
+
 	'show title': 'Afficher le titre',
+
+	'help songs': 'Déposez une musique dans cette page ou ouvrez le "Source Menu" (déplacez votre souris sur la gauche).',
 
 	'none': 'Aucune',
 

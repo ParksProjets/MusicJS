@@ -1,22 +1,46 @@
 /*
- * dancer - v0.5.3 - 2015-01-03
+ * dancer - v0.8.0 - 2015-07-25
  * https://github.com/jsantell/dancer.js
  * Copyright (c) 2015 Jordan Santell & Guillaume Gonnet
  * Licensed MIT
  */
 (function() {
 
+	var context = window.AudioContext ?
+		new window.AudioContext() :
+		new window.webkitAudioContext();
+
+
 	var Dancer = function () {
+
+		// Compressor
+		this.compressor = context.createDynamicsCompressor();
+		this.compressor.connect( context.destination );
+
+
+		// Equalizer
+		this.eq = new Dancer.EQ( context );
+		this.eq.connect( this.compressor );
+
+
+		// First adapter
 		this.audioAdapter = Dancer._getAdapter( this );
+
+
 		this.events = {};
 		this.sections = [];
+
 		this.bind( 'update', update );
 	};
 
 
-	Dancer.version = '0.5.0';
+
+	Dancer.version = '0.7.0';
 	
 	Dancer.adapters = {};
+
+	Dancer.context = context;
+
 
 	Dancer.prototype = {
 
@@ -68,24 +92,40 @@
 
 		/* Actions */
 
-		createKick : function ( options ) {
+		createKick : function (options) {
 			return new Dancer.Kick( this, options );
 		},
 
-		bind : function ( name, callback ) {
-			if ( !this.events[ name ] ) {
+
+		bind : function (name, callback) {
+			
+			if (!this.events[ name ])
 				this.events[ name ] = [];
-			}
-			this.events[ name ].push( callback );
+
+			this.events[ name ].push(callback);
+
 			return this;
 		},
 
-		unbind : function ( name ) {
-			if ( this.events[ name ] ) {
+
+		unbind : function ( name, callback ) {
+			
+			if (!this.events[ name ])
+				return this;
+
+			if (callback) {
+
+				var i = this.events[ name ].indexOf(callback);
+				if (i != -1)
+					this.events[ name ].slice(1, i);
+
+			} else {
 				delete this.events[ name ];
 			}
+
 			return this;
 		},
+
 
 		trigger : function ( name ) {
 			var _this = this;
@@ -208,6 +248,10 @@
 
 
 	function update () {
+		
+		if (this.sections.length == 0)
+			return;
+
 		for ( var i in this.sections ) {
 			if ( this.sections[ i ].condition() )
 				this.sections[ i ].callback.call( this );
@@ -280,7 +324,7 @@
 			return null;
 		
 		if ( !isUnsupportedSafari() && ( window.AudioContext || window.webkitAudioContext ))
-			return new Dancer.adapters.webaudio( instance );
+			return new Dancer.adapters.audiobuffer( instance );
 
 		return null;
 	};
@@ -385,10 +429,14 @@
 
 Equalizer
 
+
 © Guillaume Gonnet
 License MIT
 
 */
+
+
+
 (function() {
 
 
@@ -483,159 +531,19 @@ License MIT
 
 })();
 (function() {
+	
 	var
 		SAMPLE_SIZE = 2048,
 		SAMPLE_RATE = 44100;
-
-	var adapter = function ( dancer ) {
-		this.dancer = dancer;
-		this.audio = new Audio();
-		this.context = window.AudioContext ?
-			new window.AudioContext() :
-			new window.webkitAudioContext();
-	};
-
-	adapter.prototype = {
-
-		load : function ( _source ) {
-			var _this = this;
-			this.audio = _source;
-
-			this.isLoaded = false;
-			this.progress = 0;
-
-			if (!this.context.createScriptProcessor) {
-				this.context.createScriptProcessor = this.context.createJavascriptNode;
-			}
-			this.proc = this.context.createScriptProcessor( SAMPLE_SIZE / 2, 1, 1 );
-
-			this.proc.onaudioprocess = function ( e ) {
-				_this.update.call( _this, e );
-			};
-			if (!this.context.createGain) {
-				this.context.createGain = this.context.createGainNode;
-			}
-
-			this.gain = this.context.createGain();
-
-			this.fft = new FFT( SAMPLE_SIZE / 2, SAMPLE_RATE );
-			this.signal = new Float32Array( SAMPLE_SIZE / 2 );
-
-			if ( this.audio.readyState < 3 ) {
-				this.audio.addEventListener( 'canplay', function () {
-					connectContext.call( _this );
-				});
-			} else {
-				connectContext.call( _this );
-			}
-
-			this.audio.addEventListener( 'progress', function ( e ) {
-				if ( e.currentTarget.duration ) {
-					_this.progress = e.currentTarget.seekable.end( 0 ) / e.currentTarget.duration;
-				}
-			});
-
-			return this.audio;
-		},
-
-		play : function () {
-			this.audio.play();
-			this.isPlaying = true;
-		},
-
-		pause : function () {
-			this.audio.pause();
-			this.isPlaying = false;
-		},
-
-		setVolume : function ( volume ) {
-			this.gain.gain.value = volume;
-		},
-
-		getVolume : function () {
-			return this.gain.gain.value;
-		},
-
-		getProgress : function() {
-			return this.progress;
-		},
-
-		getWaveform : function () {
-			return this.signal;
-		},
-
-		getSpectrum : function () {
-			return this.fft.spectrum;
-		},
-
-		getTime : function () {
-			return this.audio.currentTime;
-		},
-
-		getDuration : function () {
-			return this.audio.duration;
-		},
-
-		update : function ( e ) {
-			if ( !this.isPlaying || !this.isLoaded ) return;
-
-			var
-				buffers = [],
-				channels = e.inputBuffer.numberOfChannels,
-				resolution = SAMPLE_SIZE / channels,
-				sum = function ( prev, curr ) {
-					return prev[ i ] + curr[ i ];
-				}, i;
-
-			for ( i = channels; i--; ) {
-				buffers.push( e.inputBuffer.getChannelData( i ) );
-			}
-
-			for ( i = 0; i < resolution; i++ ) {
-				this.signal[ i ] = channels > 1 ?
-					buffers.reduce( sum ) / channels :
-					buffers[ 0 ][ i ];
-			}
-
-			this.fft.forward( this.signal );
-			this.dancer.trigger( 'update' );
-		}
-	};
-
-	function connectContext () {
-		this.source = this.context.createMediaElementSource( this.audio );
-		this.source.connect( this.proc );
-		this.source.connect( this.gain );
-		this.gain.connect( this.context.destination );
-		this.proc.connect( this.context.destination );
-
-		this.isLoaded = true;
-		this.progress = 1;
-		this.dancer.trigger( 'loaded' );
-	}
-
-	Dancer.adapters.webaudio = adapter;
-
-})();
-
-(function() {
-	var
-		SAMPLE_SIZE = 2048,
-		SAMPLE_RATE = 44100;
-
-	var zero_array = new Float32Array(SAMPLE_SIZE);
-	var position = 0, rate = 1, beeping = false;
-
-	var levelsCount = 512;
 
 
 	var adapter = function ( dancer ) {
 		var _this = this;
-
+		
 		this.dancer = dancer;
-		this.context = window.AudioContext ?
-			new window.AudioContext() :
-			new window.webkitAudioContext();
+
+		this.audio = new Audio();
+		this.context = Dancer.context;
 
 
 		// Processor
@@ -660,7 +568,7 @@ License MIT
 		this.analyser.fftSize = 1024;
 
 
-
+/*
 		// Compressor
 		this.compressor = this.context.createDynamicsCompressor();
 		this.compressor.connect( this.context.destination );
@@ -669,7 +577,176 @@ License MIT
 		// Equalizer
 		this.eq = new Dancer.EQ( this.context );
 		this.eq.connect( this.compressor );
+*/
 
+		this.lastPlaybackRate = 1;
+		this.isPlaying = false;
+
+	};
+
+
+	adapter.prototype = {
+
+		load : function ( obj ) {
+			var _this = this;
+
+			if (this.audioNode) {
+				this.audio.pause();
+				this.audioNode.disconnect(0);
+				this.audio = null;
+			}
+
+
+
+			this.audio = obj.audio;
+
+			if (obj.audio.readyState < 3)
+				return false;
+
+
+			if (obj.node)
+				this.audioNode = obj.node;
+			else
+				this.audioNode = obj.node = this.context.createMediaElementSource(obj.audio);
+
+			this.audioNode.disconnect(0);
+
+
+			this.dancer.eq.plug(this.audioNode);
+			this.audioNode.connect(this.proc);
+			this.audioNode.connect(this.analyser);
+
+			this.audioNode.onended = function() {
+				_this.pause();
+				_this.setTime(0);
+				_this.dancer.trigger('end');
+			};
+
+		},
+
+
+		play : function () {
+			this.audio.playbackRate = this.lastPlaybackRate;
+			this.audio.play();
+
+			if (!this.isPlaying)
+				this.dancer.trigger('play');
+
+			this.isPlaying = true;
+		},
+
+
+		pause : function () {
+			this.audio.pause();
+			this.isPlaying = false;
+
+			this.dancer.trigger('pause');
+		},
+
+
+		setVolume : function ( volume ) {
+			this.eq.setGain(volume);
+		},
+
+
+		getVolume : function () {
+			return this.eq.gain.gain.value;
+		},
+
+
+		getWaveform : function () {
+			return this.signal;
+		},
+
+
+		getSpectrum : function () {
+			return this.fft.spectrum;
+		},
+
+
+		getTime : function () {
+			return this.audio.currentTime;
+		},
+
+
+		setTime : function (val) {
+			this.audio.currentTime = val;
+		},
+
+
+		getDuration : function () {
+			return this.audio.duration;
+		},
+
+
+		update : function ( e ) {
+			
+			if ( !this.isPlaying ) return;
+
+			this.signal = e.inputBuffer.getChannelData(0);
+			this.fft.forward( this.signal );
+
+			this.dancer.trigger('update');
+		}
+	};
+
+
+
+	Dancer.adapters.http = adapter;
+
+})();
+
+(function() {
+	
+	var
+		SAMPLE_SIZE = 2048,
+		SAMPLE_RATE = 44100;
+
+	var zero_array = new Float32Array(SAMPLE_SIZE);
+	var position = 0, rate = 1, beeping = false;
+
+	var levelsCount = 512;
+
+
+	var adapter = function ( dancer ) {
+		var _this = this;
+
+		this.dancer = dancer;
+		this.context = Dancer.context;
+
+
+		// Processor
+		if (!this.context.createScriptProcessor)
+			this.context.createScriptProcessor = this.context.createJavascriptNode;
+		
+		this.proc = this.context.createScriptProcessor( SAMPLE_SIZE, 1, 1 );
+		this.proc.onaudioprocess = function(e) {
+			_this.update(e);
+		};
+
+		this.proc.connect( this.context.destination );
+
+
+		// FFT
+		this.fft = new FFT( SAMPLE_SIZE, SAMPLE_RATE );
+		this.signal = new Float32Array( SAMPLE_SIZE );
+
+		// Analyser
+		this.analyser = this.context.createAnalyser();
+		this.analyser.smoothingTimeConstant = 0.1;
+		this.analyser.fftSize = 1024;
+
+
+/*
+		// Compressor
+		this.compressor = this.context.createDynamicsCompressor();
+		this.compressor.connect( this.context.destination );
+
+
+		// Equalizer
+		this.eq = new Dancer.EQ( this.context );
+		this.eq.connect( this.compressor );
+*/
 		this.buffer = null;
 
 
@@ -777,6 +854,7 @@ License MIT
 
 
 		_cleanUpAudioNode: function () {
+			
 			if (!this.audioNode)
 				return;
 
@@ -792,7 +870,7 @@ License MIT
 			this.audioNode = this.context.createBufferSource();
 			this.audioNode.buffer = this.buffer;
 
-			this.eq.plug(this.audioNode);
+			this.dancer.eq.plug(this.audioNode);
 			this.audioNode.connect(this.proc);
 			this.audioNode.connect(this.analyser);
 
@@ -812,7 +890,317 @@ License MIT
 
 
 
-	Dancer.adapters.webaudiobuffer = adapter;
+	Dancer.adapters.audiobuffer = adapter;
+
+})();
+
+(function() {
+
+	var
+		SAMPLE_SIZE = 2048,
+		SAMPLE_RATE = 44100;
+
+
+	var signal = new Float32Array( SAMPLE_SIZE );
+
+	var fft = new Float32Array( SAMPLE_SIZE / 2 );
+
+	var returnArray = function() { return []; };
+	var vide = function() {};
+	
+
+	var adapter = function ( dancer ) {
+		var _this = this;
+		
+		this.dancer = dancer;
+
+		this.audio = new Audio();
+
+
+		this.analyser = {
+			frequencyBinCount: 1,
+			getByteFrequencyData: returnArray,
+			getByteTimeDomainData: returnArray
+		};
+
+		this.eq = {
+			setGain: function(g) { _this.setVolume(g / 100); },
+			setHighGain: vide,
+			setMidGain: vide,
+			setLowGain: vide
+		};
+		
+
+		this.lastPlaybackRate = 1;
+		this.isPlaying = false;
+
+	};
+
+
+	adapter.prototype = {
+
+		load : function ( source ) {
+			var _this = this;
+
+			if (this.audio) {
+				this.audio.pause();
+				this.audio = null;
+			}
+
+
+			this.audio = source;
+
+			if (source.readyState < 3)
+				return false;
+
+
+			source.onended = function() {
+				_this.pause();
+				_this.setTime(0);
+				_this.dancer.trigger('end');
+			}
+
+		},
+
+
+		play : function () {
+			this.audio.playbackRate = this.lastPlaybackRate;
+			this.audio.play();
+
+			if (!this.isPlaying)
+				this.dancer.trigger('play');
+
+			this.isPlaying = true;
+		},
+
+
+		pause : function () {
+			this.audio.pause();
+			this.isPlaying = false;
+
+			this.dancer.trigger('pause');
+		},
+
+
+		setVolume : function ( volume ) {
+			this.audio.volume = volume;
+		},
+
+
+		getVolume : function () {
+			return this.audio.volume;
+		},
+
+
+		getWaveform : function () {
+			return signal;
+		},
+
+
+		getSpectrum : function () {
+			return fft;
+		},
+
+
+		getTime : function () {
+			return this.audio.currentTime;
+		},
+
+
+		setTime : function (val) {
+			this.audio.currentTime = val;
+		},
+
+
+		getDuration : function () {
+			return this.audio.duration;
+		},
+
+
+		update : function ( e ) {
+			
+			if ( !this.isPlaying ) return;
+
+
+			this.dancer.trigger('update');
+		}
+	};
+
+
+
+	Dancer.adapters.crossDomain = adapter;
+
+})();
+
+(function() {
+	
+	var
+		SAMPLE_SIZE = 1024,
+		SAMPLE_RATE = 44100;
+
+
+	navigator.getUserMedia =
+		( navigator.getUserMedia ||
+		  navigator.webkitGetUserMedia ||
+		  navigator.mozGetUserMedia ||
+		  navigator.msGetUserMedia );
+
+
+
+	var adapter = function ( dancer ) {
+		var _this = this;
+		
+		this.dancer = dancer;
+
+		this.audio = new Audio();
+		this.context = Dancer.context;
+
+
+		// Processor
+		if (!this.context.createScriptProcessor)
+			this.context.createScriptProcessor = this.context.createJavascriptNode;
+		
+		this.proc = this.context.createScriptProcessor( SAMPLE_SIZE, 2, 2 );
+		this.proc.onaudioprocess = function(e) {
+			_this.update(e);
+		};
+
+		this.proc.connect( this.context.destination );
+
+
+		// FFT
+		this.fft = new FFT( SAMPLE_SIZE, SAMPLE_RATE );
+		this.signal = new Float32Array( SAMPLE_SIZE );
+
+		// Analyser
+		this.analyser = this.context.createAnalyser();
+		this.analyser.smoothingTimeConstant = 0.1;
+		this.analyser.fftSize = 1024;
+
+
+/*
+		// Compressor
+		this.compressor = this.context.createDynamicsCompressor();
+		this.compressor.connect( this.context.destination );
+
+
+		// Equalizer
+		this.eq = new Dancer.EQ( this.context );
+		this.eq.connect( this.compressor );
+*/
+
+		this.lastPlaybackRate = 1;
+		this.isPlaying = false;
+
+	};
+
+
+
+	adapter.prototype = {
+
+		play : function () {
+			var _this = this;
+
+			if (this.isPlaying)
+				return;
+
+
+			if (this.audioNode) {
+				this.audioNode.disconnect(0);
+				this.audioNode = null;
+			}
+			
+
+			navigator.getUserMedia({ audio: true }, function(stream) {
+				
+				_this._setUp(stream);
+
+				_this.dancer.trigger('play');
+				_this.isPlaying = true;
+
+			}, function() {
+				console.log('Error microphone');
+
+				_this.isPlaying = false;
+				_this.dancer.trigger('pause');
+			});
+		},
+
+
+		pause : function () {
+
+			if (this.audioNode)
+				this.stream.stop();
+
+			this.isPlaying = false;
+			this.dancer.trigger('pause');
+		},
+
+
+
+		setVolume : function ( volume ) {
+			this.eq.setGain(volume);
+		},
+
+
+		getVolume : function () {
+			return this.eq.gain.gain.value;
+		},
+
+
+		getWaveform : function () {
+			return this.signal;
+		},
+
+
+		getSpectrum : function () {
+			return this.fft.spectrum;
+		},
+
+
+		getTime : function () {
+			return 0;
+		},
+
+
+		setTime : function (val) {
+			//this.audio.currentTime = val;
+		},
+
+
+		getDuration : function () {
+			return 0;
+		},
+
+
+		update : function ( e ) {
+			
+			if ( !this.isPlaying ) return;
+
+			
+			this.signal = e.inputBuffer.getChannelData(0);
+			this.fft.forward( this.signal );
+
+			this.dancer.trigger('update');
+		},
+
+
+
+		_setUp : function(stream) {
+
+			this.stream = stream;
+
+			this.audioNode = this.context.createMediaStreamSource(stream);
+
+			this.dancer.eq.plug(this.audioNode);
+			this.audioNode.connect(this.proc);
+			this.audioNode.connect(this.analyser);
+		}
+	};
+
+
+
+	Dancer.adapters.microphone = adapter;
 
 })();
 

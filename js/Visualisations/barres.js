@@ -2,6 +2,10 @@
 
 FFT Visualisation barres
 
+
+© Guillaume Gonnet
+License GPLv2
+
 */
 
 
@@ -32,7 +36,7 @@ FFT Visualisation barres
 
 
 	function setTitle() {
-		var song = Player.playlist.get();
+		var song = Playlist.get();
 
 		$title.text(song.name);
 

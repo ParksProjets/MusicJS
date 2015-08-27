@@ -6,7 +6,7 @@
 	<title>Music</title>
 	<meta name="description" content="A music player in HTML5">
 
-	<link href="css/allv2.css" rel="stylesheet">
+	<link href="css/allv3.css" rel="stylesheet">
 
 </head>
 <body>
@@ -36,19 +36,12 @@
 			
 			
 			
-			<div id="songs"></div>
-			
-			
-			<p class="tr" id="helpBtn">help</p>
-
-			<div id="params">
-				<h3>OPTIONS</h3>
-				<p>
-					<a id="btnMusic">Options Music</a>
-					<a id="btnEQ">Equalizer</a>
-					<a id="btnFFT">Options FFT</a>
-				</p>
+			<div id="songs">
+				<p id="helpSongs" class="tr">help songs</p>
 			</div>
+			
+			
+			<p id="managePlayBtn" class="tr">manage playlist</p>
 	
 		</div>
 	</div>
@@ -56,6 +49,62 @@
 
 
 
+	<!--  List of menu  -->
+	<div class="menu" id="listMenu">
+		
+		<h3>Menus</h3>
+
+		<a class="a-btn" data-menu="HelpMenu">Help</a>
+
+		<a class="a-btn" data-menu="SourceMenu">Source Menu</a>
+
+		<a class="a-btn" data-menu="MusicMenu">Options Music</a>
+
+		<a class="a-btn" data-menu="EQMenu">Equalizer</a>
+
+		<a class="a-btn"  data-menu="FFTMenu">Options Visualisation</a>
+
+	</div>
+
+
+
+
+
+	<!--  Source menu  -->
+	<div class="menu" id="sourceMenu">
+		
+		<div id="sourceChoices">
+			<h3>Source Menu</h3>
+
+			<p>Drop a music file in the page</p>
+
+			<a class="a-btn" id="btnSrcUrl">Load from an URL</a>
+
+			<a class="a-btn" id="btnSrcSC">Load from Soundcloud</a>
+
+			<a class="a-btn" id="btnSrcMicro">Use the microphone</a>
+		</div>
+
+		
+		<!-- Source from URL -->
+		<div id="sourceURL">
+			
+		</div>
+
+		<!-- Source from Soundcloud -->
+		<div id="sourceSoundcloud">
+			<h3>From Souncloud</h3>
+
+			<input type="text" placeholder="Search">
+		</div>
+
+	</div>
+
+
+
+
+
+	<!--  Menu FFT  -->
 	<div class="menu" id="optionsFFT">
 		
 		<h3 class="tr">general options</h3>
@@ -78,7 +127,8 @@
 	</div>
 
 
-
+	
+	<!-- Music Menu -->
 	<div class="menu" id="musicMenu">
 		
 		<h3>Music Menu</h3>
@@ -101,11 +151,23 @@
 
 		<input type="radio" name="crossfade" value="false" id="radioCFOff">
 		<label for="radioCFOff"><span></span class="tr">Disenabled</label><br>
+		<br>
+
+
+		<h5>Storage</h5>
+		<input type="radio" name="storage" value="auto" id="radioAuto" checked>
+		<label for="radioAuto"><span></span>Auto</label><br>
+
+		<input type="radio" name="storage" value="buffered" id="radioBuffer">
+		<label for="radioBuffer"><span></span>Buffered</label><br>
+
+		<input type="radio" name="storage" value="blob" id="radioBlob">
+		<label for="radioBlob"><span></span class="tr">In blob</label><br>
 
 	</div>
 
 
-
+	<!-- Equalizer -->
 	<div id="eq">
 		<div id="volume"></div>
 
@@ -118,7 +180,7 @@
 
 
 
-
+	<!-- Help -->
 	<div class="menu" id="help">
 		
 		<h3 class="tr">shortcuts</h3>
@@ -208,7 +270,10 @@
 	<script src="js/vendors/dancer.js"></script>
 	<script src="js/vendors/three.min.js"></script>
 
-	<script src="js/allv2.js"></script>
+	<script src="http://connect.soundcloud.com/sdk.js"></script>
+
+	<script src="js/allv3.js"></script>
+	<!--<script src="https://apis.google.com/js/client.js?onload=onClientLoad" type="text/javascript"></script>-->
 
 </body>
 </html>

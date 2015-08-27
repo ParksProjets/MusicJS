@@ -2,6 +2,7 @@
 
 Manager of FFTs
 
+
 © Guillaume Gonnet
 License GPLv2
 
@@ -14,9 +15,12 @@ var FFTManager = [];
 FFTManager.current = 0;
 
 
+
+// Get the current visualisation
 FFTManager.get = function() {
 	return FFTManager[FFTManager.current];
 }
+
 
 
 FFTManager.set = function(index) {

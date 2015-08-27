@@ -1,6 +1,10 @@
 /*
 
-FTT Logo 3D
+FTT with 3D Logo
+
+
+© Guillaume Gonnet
+License GPLv2
 
 */
 

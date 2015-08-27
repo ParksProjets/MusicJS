@@ -3,6 +3,7 @@
 Beat Detector
 http://tech.beatport.com/2014/web-audio/beat-detection-using-web-audio/
 
+
 © Guillaume Gonnet
 License GPLv2
 
@@ -19,7 +20,7 @@ License GPLv2
 
 	BeatDetector.run = function(obj) {
 
-		if (typeof OfflineAudioContext == "undefined")
+		if (typeof OfflineAudioContext == "undefined" || !obj.buffer)
 			return false;
 		
 

@@ -27,26 +27,11 @@ resize();
 
 
 
-// Menus
-
-var Menus = [];
-
-Menus.hideAll = function() {
-
-	for (var i = 0; i  < Menus.length; i++)
-		Menus[i].hide();
-}
-
-
-
-
-
 // Dancer
 
 var dancer = new Dancer(),
-	adapter = new Dancer.adapters.webaudiobuffer(dancer);
+	adapter = dancer.audioAdapter;
 		
-dancer.audioAdapter = adapter;
 
 
 
@@ -56,6 +41,9 @@ dancer.audioAdapter = adapter;
 $(window).keydown(onKeyDown);
 
 function onKeyDown(e) {
+
+	if ($("input:focus").length)
+		return;
 
 	if (e.keyCode == 38) {
 		FFTManager.prev();
@@ -81,3 +69,34 @@ function onKeyDown(e) {
 		MusicMenu.switch();
 	}
 }
+
+
+
+
+
+
+// Events Window
+
+function onMouseMove(e) {
+	
+	// Control Menu
+
+	if (ControlsMenu.opened && e.pageX < wWidth - 255)
+		ControlsMenu.close();
+
+	else if (!ControlsMenu.opened && e.pageX > wWidth - 100)
+		ControlsMenu.open();
+
+
+
+	// Menus on the left
+
+	else if (!Menus.isOneVisible && e.pageX < 100)
+		ListMenu.open();
+
+	else if (Menus.isOneVisible && e.pageX > 250)
+		Menus.hideAll();
+}
+
+
+$(window).mousemove(onMouseMove);
